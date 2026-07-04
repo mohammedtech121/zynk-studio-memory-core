@@ -1,8 +1,18 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import cognee
 
 app = FastAPI()
+
+# 🚀 CORS MIDDLEWARE: Ye tere Vercel frontend ko block hone se bachayega
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (Perfect for hackathon)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows POST, GET, OPTIONS, etc.
+    allow_headers=["*"],
+)
 
 class MemoryRequest(BaseModel):
     text: str
@@ -13,17 +23,23 @@ async def root():
 
 @app.post("/remember")
 async def remember_memory(request: MemoryRequest):
-    # Cognee logic for ingestion
-    await cognee.add(request.text)
-    return {"status": "success", "message": "Memory synced to Knowledge Graph successfully!"}
+    try:
+        # Cognee logic for ingestion
+        await cognee.add(request.text)
+        return {"status": "success", "message": "Memory synced to Knowledge Graph successfully!"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.post("/query")
 async def query_memory(request: Request):
-    data = await request.json()
-    user_query = data.get("query", "")
-    # Cognee logic for querying
-    answer = await cognee.query(user_query)
-    return {"answer": f"AI Agent says: {answer}"}
+    try:
+        data = await request.json()
+        user_query = data.get("query", "")
+        # Cognee logic for querying
+        answer = await cognee.query(user_query)
+        return {"answer": f"AI Agent says: {answer}"}
+    except Exception as e:
+        return {"answer": f"Error: {str(e)}"}
 
 @app.post("/forget")
 async def forget_memory(request: Request):
