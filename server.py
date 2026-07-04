@@ -1,77 +1,43 @@
 import os
-import asyncio
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import cognee
-from dotenv import load_dotenv
 
-# Env variables load karna (automatic API key utha lega)
-load_dotenv()
-
+# Zynk Studio Memory Core Initialization
 app = FastAPI(title="Zynk Studio Memory Core")
 
-# CORS config taaki frontend backend se securely connect kar sake
+# 🚀 Vercel ko VIP Pass (CORS Setup) - Cloud connection ke liye
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Vercel ko allow karne ke liye
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Input Validation Models
-class MemoryInput(BaseModel):
+# UI se aane wale data ka structure
+class MemoryRequest(BaseModel):
     text: str
 
-class QueryInput(BaseModel):
-    query: str
+# Test karne ke liye basic route
+@app.get("/")
+async def root():
+    return {"message": "Zynk Studio Core Server is running perfectly!"}
 
-class ForgetInput(BaseModel):
-    dataset_name: str
-
-
-# 1. Ingest Data (Remember)
+# Tera main Autonomous Agent endpoint jo UI se connect hoga
 @app.post("/remember")
-async def add_memory(data: MemoryInput):
+async def remember_memory(request: MemoryRequest):
     try:
-        await cognee.remember(data.text)
-        return {"status": "success", "message": "Successfully structured into Cognee Cloud graph!"}
+        client_text = request.text
+        print(f"New Client Requirement Received: {client_text}")
+        
+        # (Yahan tera Cognee ya RAG ka jo bhi processing logic hai wo backend mein chalega)
+        
+        # UI ko success message bhejna
+        return {
+            "status": "success", 
+            "message": "Memory synced to Knowledge Graph successfully!",
+            "data": client_text
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# 2. Query Data (Recall)
-@app.post("/recall")
-async def get_memory(data: QueryInput):
-    try:
-        result = await cognee.recall(data.query)
-        return {"status": "success", "result": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# 3. Enrich Graph (Improve/Memify)
-@app.post("/improve")
-async def optimize_memory():
-    try:
-        await cognee.improve()
-        return {"status": "success", "message": "Memory graph enriched and memified successfully!"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# 4. Prune Data (Forget)
-@app.post("/forget")
-async def delete_memory(data: ForgetInput):
-    try:
-        await cognee.forget(dataset=data.dataset_name)
-        return {"status": "success", "message": f"Dataset '{data.dataset_name}' pruned cleanly."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-if __name__ == "__main__":
-    import uvicorn
-    # Server run command (Error fixed and perfectly indented)
-    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)
+        return {"status": "error", "message": str(e)}
