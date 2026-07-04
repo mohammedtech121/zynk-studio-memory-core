@@ -195,60 +195,55 @@
     </div>
 
     <script>
-       const BACKEND_URL = 'https://2fs8fphx-8000.inc1.devtunnels.ms';
+    // ZYNC STUDIO KI NAYI PERMANENT CLOUD LINK
+    const BACKEND_URL = 'https://zynk-studio-memory-core.onrender.com'; 
 
-        async function saveMemory() {
-            const text = document.getElementById('memoryText').value;
-            const outputDiv = document.getElementById('saveOutput');
-            outputDiv.style.display = 'block'; outputDiv.style.color = '#a1a1aa';
-            outputDiv.innerText = 'Syncing...';
-            try {
-                const response = await fetch(`${BACKEND_URL}/remember`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text })
-                });
-                const data = await response.json();
-                outputDiv.style.color = '#10b981'; outputDiv.innerText = JSON.stringify(data, null, 2);
-            } catch (err) { outputDiv.style.color = '#ef4444'; outputDiv.innerText = 'Error: Make sure your backend (py server.py) is running!\n' + err.message; }
-        }
+    async function saveMemory() {
+        const text = document.getElementById('memoryText').value;
+        const outputDiv = document.getElementById('saveOutput');
+        
+        // Processing State
+        outputDiv.style.display = 'block'; 
+        outputDiv.style.color = '#a1a1aa';
+        outputDiv.innerText = 'Syncing to Zync Studio Core...';
 
-        async function queryMemory() {
-            const query = document.getElementById('queryText').value;
-            const outputDiv = document.getElementById('queryOutput');
-            outputDiv.style.display = 'block'; outputDiv.style.color = '#a1a1aa';
-            outputDiv.innerText = 'Searching...';
-            try {
-                const response = await fetch(`${BACKEND_URL}/recall`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: query })
-                });
-                const data = await response.json();
-                outputDiv.style.color = '#10b981'; outputDiv.innerText = JSON.stringify(data, null, 2);
-            } catch (err) { outputDiv.style.color = '#ef4444'; outputDiv.innerText = 'Error: Make sure your backend (py server.py) is running!\n' + err.message; }
+        try {
+            const response = await fetch(`${BACKEND_URL}/remember`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            });
+            
+            const data = await response.json();
+            
+            // Success State
+            if(response.ok && data.status === "success") {
+                outputDiv.style.color = '#10b981'; 
+                outputDiv.innerText = data.message;
+            } else {
+                // Error from Backend
+                outputDiv.style.color = '#ef4444'; 
+                outputDiv.innerText = 'Error: ' + (data.message || 'Kuch galat hua, check logs.');
+            }
+        } catch (err) {
+            // Connection Error
+            outputDiv.style.color = '#ef4444'; 
+            outputDiv.innerText = 'Error: Zync Studio Core se connect nahi ho pa raha hai!';
         }
+    }
 
-        async function improveMemory() {
-            const outputDiv = document.getElementById('saveOutput');
-            outputDiv.style.display = 'block'; outputDiv.style.color = '#a1a1aa';
-            outputDiv.innerText = 'Enriching...';
-            try {
-                const response = await fetch(`${BACKEND_URL}/improve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }});
-                const data = await response.json();
-                outputDiv.style.color = '#10b981'; outputDiv.innerText = JSON.stringify(data, null, 2);
-            } catch (err) { outputDiv.style.color = '#ef4444'; outputDiv.innerText = 'Error: Make sure your backend (py server.py) is running!\n' + err.message; }
-        }
-
-        async function forgetMemory() {
-            const dataset = document.getElementById('forgetText').value;
-            const outputDiv = document.getElementById('forgetOutput');
-            outputDiv.style.display = 'block'; outputDiv.style.color = '#a1a1aa';
-            outputDiv.innerText = 'Pruning...';
-            try {
-                const response = await fetch(`${BACKEND_URL}/forget`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dataset_name: dataset })
-                });
-                const data = await response.json();
-                outputDiv.style.color = '#10b981'; outputDiv.innerText = JSON.stringify(data, null, 2);
-            } catch (err) { outputDiv.style.color = '#ef4444'; outputDiv.innerText = 'Error: Make sure your backend (py server.py) is running!\n' + err.message; }
-        }
+    // Baaki buttons ke liye placeholders taaki error na aaye
+    function improveMemory() {
+        alert("Memify feature coming soon!");
+    }
+    
+    function queryMemory() {
+        alert("Query feature coming soon!");
+    }
+    
+    function forgetMemory() {
+        alert("Prune sequence feature coming soon!");
+    }
     </script>
 </body>
 </html>
